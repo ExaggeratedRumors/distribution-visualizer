@@ -2,16 +2,14 @@ package gui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -24,6 +22,9 @@ import kotlin.system.exitProcess
 
 class AppWindow {
     private lateinit var state : WindowState
+    private lateinit var chosenDistribution : String
+    private lateinit var showGrid : MutableState<Boolean>
+
     private val colors = darkColors(
         primary = Color(112, 54, 111),
         surface = Color(110, 52, 109),
@@ -34,6 +35,7 @@ class AppWindow {
     @Preview
     fun initGUI() = application {
         state = rememberWindowState(placement = WindowPlacement.Floating)
+        showGrid = remember { mutableStateOf(true) }
         Window(
             onCloseRequest = { exitApplication() },
             title = Utils.appName,
@@ -44,12 +46,12 @@ class AppWindow {
             resizable = false
         ) {
             createWindow()
-            appWindowTitleBar()
+            createAppWindowBar()
         }
     }
 
     @Composable
-    fun FrameWindowScope.appWindowTitleBar() = WindowDraggableArea {
+    fun FrameWindowScope.createAppWindowBar() = WindowDraggableArea {
         MaterialTheme (colors = colors) {
             Surface(
                 modifier = Modifier.fillMaxWidth().height(40.dp),
@@ -87,67 +89,9 @@ class AppWindow {
             modifier = Modifier.fillMaxSize().padding(0.dp, 40.dp, 0.dp, 0.dp).shadow(15.dp, RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp), true),
             color = colors.secondary,
             shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("isFullscreen")
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        state.placement == WindowPlacement.Maximized,
-                        {
-                            state.placement = if (it) {
-                                WindowPlacement.Maximized
-                            } else {
-                                WindowPlacement.Floating
-                            }
-                        }
-                    )
-                    Text("isMaximized")
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(state.isMinimized, { state.isMinimized = !state.isMinimized })
-                    Text("isMinimized")
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    var text by remember { mutableStateOf("Hello, World!") }
-                    MaterialTheme {
-                        Button(onClick = {
-                            text = "Hello, Desktop!"
-                        }) {
-                            Text(text)
-                        }
-                    }
-                }
-
-
-                Text(
-                    "Position ${state.position}",
-                    Modifier.clickable {
-                        val position = state.position
-                        if (position is WindowPosition.Absolute) {
-                            state.position = position.copy(x = state.position.x + 10.dp)
-                        }
-                    }
-                )
-
-                Text(
-                    "Size ${state.size}",
-                    Modifier.clickable {
-                        state.size = state.size.copy(width = state.size.width + 10.dp)
-                    }
-                )
-                TwoColumnsLayout()
-
-            }
-
-
-        }
-
+        ) { TwoColumnsLayout() }
     }
+
 
     @Composable
     fun TwoColumnsLayout() {
@@ -170,20 +114,30 @@ class AppWindow {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.4f)
+                .fillMaxWidth(0.7f)
                 .padding(20.dp)
         ) {
             Row {
-                Text(text = "Left Pane First Text Box", modifier = Modifier.weight(1f))
+                Text(text = "Chosen distribution:", modifier = Modifier.weight(1f))
                 Text(text = "Left Pane Second Text Box", modifier = Modifier.weight(1f))
             }
+
             Spacer(Modifier.size(20.dp))
-            Column(Modifier.weight(1f).border(1.dp, color = Color.Black)) {
-                Text(text = "Left Pane Radio button Box  ", modifier = Modifier.padding(start = 8.dp))
-                //val options = listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5")
+            Column(
+                Modifier.weight(1f).border(1.dp, color = Color.Black).fillMaxWidth(0.7f)
+            ) {
+
             }
-            Spacer(Modifier.size(100.dp))
-            Text(text = "Left Pane bottom Text Box")
+            Spacer(Modifier.size(20.dp))
+            Row (verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    showGrid.value,
+                    { showGrid.value = it },
+                    enabled = true,
+                    colors = CheckboxDefaults.colors(Color.Green)
+                )
+                Text("Show Grid")
+            }
         }
     }
 
@@ -196,12 +150,12 @@ class AppWindow {
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-            Text(text = "Right Pane First Text Box")
+            Text(text = "Input mean")
             Spacer(Modifier.size(20.dp))
             Row {
-                Text(text = "Right Pane Second Text Box", modifier = Modifier.weight(1f))
+                Text(text = "Input SD", modifier = Modifier.weight(1f))
                 Spacer(Modifier.size(20.dp))
-                Text(text = "Right Pane Third Text Box", modifier = Modifier.weight(1f))
+                Text(text = "[ ]", modifier = Modifier.weight(1f))
             }
         }
     }
