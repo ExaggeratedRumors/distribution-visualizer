@@ -22,25 +22,14 @@ import kotlin.system.exitProcess
 
 class AppWindow {
     private lateinit var state : WindowState
-    private lateinit var chosenDistribution : String
-    private lateinit var showGrid : MutableState<Boolean>
 
-    private val colors = darkColors(
-        primary = Color(112, 54, 111),
-        surface = Color(110, 52, 109),
-        onSurface = Color.White,
-        secondary =  Color(53, 64, 118)
-    )
-
-    @Preview
     fun initGUI() = application {
         state = rememberWindowState(placement = WindowPlacement.Floating)
-        showGrid = remember { mutableStateOf(true) }
         Window(
             onCloseRequest = { exitApplication() },
-            title = Utils.appName,
+            title = Strings.appName,
             transparent = true,
-            icon = painterResource(Utils.iconPath),
+            icon = painterResource(Strings.iconPath),
             undecorated = true,
             state = state,
             resizable = false
@@ -52,7 +41,7 @@ class AppWindow {
 
     @Composable
     fun FrameWindowScope.createAppWindowBar() = WindowDraggableArea {
-        MaterialTheme (colors = colors) {
+        MaterialTheme (colors = Theme.darkTheme) {
             Surface(
                 modifier = Modifier.fillMaxWidth().height(40.dp),
                 shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
@@ -62,10 +51,10 @@ class AppWindow {
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        text = Utils.appName,
+                        text = Strings.appName,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.width(150.dp),
-                        fontFamily = Utils.font,
+                        fontFamily = Typography.mainFont,
                     )
                     Spacer(Modifier.size(200.dp))
                     Button(onClick = {
@@ -87,76 +76,8 @@ class AppWindow {
     private fun createWindow() {
         Surface(
             modifier = Modifier.fillMaxSize().padding(0.dp, 40.dp, 0.dp, 0.dp).shadow(15.dp, RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp), true),
-            color = colors.secondary,
+            color = Theme.darkTheme.secondary,
             shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp)
-        ) { TwoColumnsLayout() }
-    }
-
-
-    @Composable
-    fun TwoColumnsLayout() {
-        Row(Modifier.fillMaxSize()) {
-            LeftPaneContent()
-            Divider(
-                color = Color.Blue,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(1.dp)
-            )
-            RightPaneContent()
-        }
-    }
-
-    @Composable
-    fun LeftPaneContent() {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(0.7f)
-                .padding(20.dp)
-        ) {
-            Row {
-                Text(text = "Chosen distribution:", modifier = Modifier.weight(1f))
-                Text(text = "Left Pane Second Text Box", modifier = Modifier.weight(1f))
-            }
-
-            Spacer(Modifier.size(20.dp))
-            Column(
-                Modifier.weight(1f).border(1.dp, color = Color.Black).fillMaxWidth(0.7f)
-            ) {
-
-            }
-            Spacer(Modifier.size(20.dp))
-            Row (verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    showGrid.value,
-                    { showGrid.value = it },
-                    enabled = true,
-                    colors = CheckboxDefaults.colors(Color.Green)
-                )
-                Text("Show Grid")
-            }
-        }
-    }
-
-    @Composable
-    fun RightPaneContent() {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-        ) {
-            Text(text = "Input mean")
-            Spacer(Modifier.size(20.dp))
-            Row {
-                Text(text = "Input SD", modifier = Modifier.weight(1f))
-                Spacer(Modifier.size(20.dp))
-                Text(text = "[ ]", modifier = Modifier.weight(1f))
-            }
-        }
+        ) { AppLayout().twoColumnsLayout() }
     }
 }
