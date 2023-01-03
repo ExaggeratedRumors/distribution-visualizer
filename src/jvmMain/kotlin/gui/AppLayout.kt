@@ -1,41 +1,40 @@
 package gui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import model.Distribution
+import model.Gauss
+import model.Graph
+import model.Linear
 
 class AppLayout {
-    private lateinit var chosenDistribution : String
+    private lateinit var chosenDistribution : MutableState<String>
     private lateinit var showGrid : MutableState<Boolean>
 
     @Composable
     fun twoColumnsLayout() {
+        chosenDistribution = remember { mutableStateOf("None") }
         showGrid = remember { mutableStateOf(true) }
-        Row(Modifier.fillMaxSize()) {
-            LeftPaneContent()
-            Divider(
-                color = Color.Blue,
+        Row (Modifier.fillMaxSize()) {
+            leftPaneContent()
+            Divider (
+                color = Theme.colorPalette.primary,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(1.dp)
             )
-            RightPaneContent()
+            rightPaneContent()
         }
     }
 
     @Composable
-    fun LeftPaneContent() {
+    fun leftPaneContent() {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -45,23 +44,28 @@ class AppLayout {
                 .padding(20.dp)
         ) {
             Row {
-                Text(text = "Chosen distribution:", modifier = Modifier.weight(1f))
-                Text(text = "Left Pane Second Text Box", modifier = Modifier.weight(1f))
+                Text (text = "Chosen distribution: ${chosenDistribution.value}", modifier = Modifier.weight(1f))
+                Text (text = "Left Pane Second Text Box", modifier = Modifier.weight(1f))
             }
 
-            Spacer(Modifier.size(20.dp))
-            Column(
-                Modifier.weight(1f).border(1.dp, color = Color.Black).fillMaxWidth(0.7f)
+            Spacer (Modifier.size(20.dp))
+            Column (
+                Modifier.weight(1f)
+                    .border(1.dp, color = Theme.colorPalette.primary)
+                    .fillMaxWidth(0.7f)
+                    .background(color = Theme.colorPalette.onSurface)
             ) {
-
+                val graph = Graph()
+                val testDis = Gauss(50f, 10f)
+                graph.createDistributionChart(testDis)
             }
-            Spacer(Modifier.size(20.dp))
+            Spacer (Modifier.size(20.dp))
             Row (verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     showGrid.value,
                     { showGrid.value = it },
                     enabled = true,
-                    colors = CheckboxDefaults.colors(Color.Green)
+                    colors = CheckboxDefaults.colors(Theme.colorPalette.primary)
                 )
                 Text("Show Grid")
             }
@@ -69,21 +73,26 @@ class AppLayout {
     }
 
     @Composable
-    fun RightPaneContent() {
-        Column(
+    fun rightPaneContent() {
+        Column (
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
-            Text(text = "Input mean")
-            Spacer(Modifier.size(20.dp))
+            Text (text = "Input mean")
+            Spacer (Modifier.size(20.dp))
             Row {
-                Text(text = "Input SD", modifier = Modifier.weight(1f))
-                Spacer(Modifier.size(20.dp))
-                Text(text = "[ ]", modifier = Modifier.weight(1f))
+                Text (text = "Input SD", modifier = Modifier.weight(1f))
+                Spacer (Modifier.size(20.dp))
+                Text (text = "[ ]", modifier = Modifier.weight(1f))
             }
+            ExtendedFloatingActionButton(
+                onClick = { chosenDistribution.value = if (chosenDistribution.value == "None") "Gaussian" else "None" },
+                text = { Text(text = "Change distribution") }
+
+            )
         }
     }
 }

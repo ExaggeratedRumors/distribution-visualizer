@@ -1,19 +1,13 @@
 package gui
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,7 +35,7 @@ class AppWindow {
 
     @Composable
     fun FrameWindowScope.createAppWindowBar() = WindowDraggableArea {
-        MaterialTheme (colors = Theme.darkTheme) {
+        MaterialTheme (colors = Theme.colorPalette) {
             Surface(
                 modifier = Modifier.fillMaxWidth().height(40.dp),
                 shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
@@ -54,7 +48,7 @@ class AppWindow {
                         text = Strings.appName,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.width(150.dp),
-                        fontFamily = Typography.mainFont,
+                        fontFamily = Typography.mainTypography.body1.fontFamily,
                     )
                     Spacer(Modifier.size(200.dp))
                     Button(onClick = {
@@ -76,7 +70,7 @@ class AppWindow {
     private fun createWindow() {
         Surface(
             modifier = Modifier.fillMaxSize().padding(0.dp, 40.dp, 0.dp, 0.dp).shadow(15.dp, RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp), true),
-            color = Theme.darkTheme.secondary,
+            color = Theme.colorPalette.secondary,
             shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp)
         ) { AppLayout().twoColumnsLayout() }
     }
