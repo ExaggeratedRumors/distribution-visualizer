@@ -2,14 +2,16 @@ package model
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
 import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import gui.Theme
 
 data class Point(val x: Float, val y: Float)
 
@@ -23,32 +25,49 @@ class Graph {
 
     @Composable
     fun printChart(distribution: Distribution, min: Float, max: Float) {
-        Box(modifier = Modifier.size(300.dp, 200.dp)
+        var tooltipValue by remember { mutableStateOf("(0,0)") }
+        val scale = Array(4) { FloatArray(2) }
+
+        Box(modifier = Modifier
+            .size(300.dp, 200.dp)
             .drawBehind {
                 val function =
                     (0..100).map {
                         min + it / (max - min)
                     }.map {
                         Point(
-                            it.toFloat(),
-                            distribution.probabilityDensityFunction(it.toFloat()))
+                            it,
+                            distribution.probabilityDensityFunction(it))
                     }.let {
-                        val minHor = it.minOf { v -> v.x }
-                        val maxHor = it.maxOf { v -> v.x }
-                        val minVer = it.minOf { v -> v.y }
-                        val maxVer = it.maxOf { v -> v.y }
+                        scale[0][0] = it.minOf { v -> v.x }
+                        scale[0][1] = it.maxOf { v -> v.x }
+                        scale[1][0] = it.minOf { v -> v.y }
+                        scale[1][1] = it.maxOf { v -> v.y }
+                        scale[2][0] = 0f
+                        scale[2][1] = size.width
+                        scale[3][0] = size.height
+                        scale[3][1] = 0f
                         it.map { p ->
-                            val x = p.x.rescale(minHor, maxHor, 0f, size.width)
-                            val y = p.y.rescale(minVer, maxVer, size.height, 0f)
+                            val x = p.x.rescale(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
+                            val y = p.y.rescale(scale[1][0], scale[1][1], scale[3][0], scale[3][1])
                             Point(x, y)
                         }
                     }
-
                 val path = Path()
                 path.moveTo(function[0].x, function[0].y)
                 function.drop(0).forEach { path.lineTo(it.x, it.y) }
-                drawPath(path, color = Color.Cyan, style = Stroke(width = 3f))
-            })
+                drawPath(path, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
+            }.pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while(true) {
+                        val position = awaitPointerEvent().changes.first().position
+                        val x = position.x.rescale(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
+                        tooltipValue = "(${position.x},${position.y})"
+                    }
+                }
+            }) {
+            Text(tooltipValue)
+        }
     }
 
     @Composable

@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object Theme {
-    public val colorPalette = darkColors(
+    val colorPalette = darkColors(
         primary = Color(112, 54, 111),
         surface = Color(110, 52, 109),
         onSurface = Color(199, 211, 221),
@@ -17,7 +17,7 @@ object Theme {
         background = Color(110, 52, 109)
     )
 
-    public val shapes = Shapes(
+    val shapes = Shapes(
         small = RoundedCornerShape(4.dp),
         medium = RoundedCornerShape(4.dp),
         large = RoundedCornerShape(0.dp)
