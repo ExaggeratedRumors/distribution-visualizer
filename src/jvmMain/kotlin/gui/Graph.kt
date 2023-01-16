@@ -37,7 +37,7 @@ class Graph {
                     }.map {
                         Point(
                             it,
-                            distribution.probabilityDensityFunction(it))
+                            distribution.probabilityDensityFunction(it.toInt()))
                     }.let {
                         scale[0][0] = it.minOf { v -> v.x }
                         scale[0][1] = it.maxOf { v -> v.x }
@@ -62,7 +62,8 @@ class Graph {
                     while(true) {
                         val position = awaitPointerEvent().changes.first().position
                         val x = position.x.rescale(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
-                        tooltipValue = "(${position.x},${position.y})"
+                        val y = position.x.rescale(scale[1][0], scale[1][1], scale[3][0], scale[3][1])
+                        tooltipValue = "($x,$y)"
                     }
                 }
             }) {

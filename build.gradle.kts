@@ -27,6 +27,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
             }
         }
         val jvmTest by getting
