@@ -8,10 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import model.Distribution
 import model.Gauss
-import model.Graph
-import model.Linear
 
 class AppLayout {
     private lateinit var chosenDistribution : MutableState<String>
@@ -53,7 +50,8 @@ class AppLayout {
                 Modifier.weight(1f)
                     .border(1.dp, color = Theme.colorPalette.primary)
                     .fillMaxWidth(0.7f)
-                    .background(color = Theme.colorPalette.onSurface)
+                    .background(color = Theme.colorPalette.onSurface),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val graph = Graph()
                 val testDis = Gauss(50f, 10f)

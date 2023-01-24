@@ -1,4 +1,4 @@
-package model
+package gui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -11,11 +11,20 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-import gui.Theme
+import model.Distribution
+import java.lang.Float.max
+import java.util.*
 
 data class Point(val x: Float, val y: Float)
 
 class Graph {
+    private val scale = Array(4) { FloatArray(2) }
+
+    private fun getMinX() = scale[0][0]
+    private fun getMaxX() = scale[0][1]
+    private fun getMinY() = scale[1][0]
+    private fun getMaxY() = scale[1][1]
+
     private fun Float.rescale(
         min1: Float,
         max1: Float,
@@ -25,8 +34,7 @@ class Graph {
 
     @Composable
     fun printChart(distribution: Distribution, min: Float, max: Float) {
-        var tooltipValue by remember { mutableStateOf("(0,0)") }
-        val scale = Array(4) { FloatArray(2) }
+        var tooltipValue by remember { mutableStateOf("x:\ny:") }
 
         Box(modifier = Modifier
             .size(300.dp, 200.dp)
@@ -61,9 +69,9 @@ class Graph {
                 awaitPointerEventScope {
                     while(true) {
                         val position = awaitPointerEvent().changes.first().position
-                        val x = position.x.rescale(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
-                        val y = position.x.rescale(scale[1][0], scale[1][1], scale[3][0], scale[3][1])
-                        tooltipValue = "($x,$y)"
+                        val x = max(0f, position.x.rescale(scale[2][0], scale[2][1], scale[0][0], scale[0][1]))
+                        val y = max(0f, position.y.rescale(scale[3][0], scale[3][1], scale[1][0], scale[1][1]))
+                        tooltipValue = "x: %.0f".format(x) + "\ny: %.2f".format(Locale.ROOT, y)
                     }
                 }
             }) {
@@ -73,38 +81,48 @@ class Graph {
 
     @Composable
     fun printVerticalLabels() {
+        var minY by remember { mutableStateOf( 0f ) }
+        var maxY by remember { mutableStateOf( 0f ) }
         Column(
-            modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxHeight().drawBehind {
+                minY = getMinY()
+                maxY = getMaxY()
+            }
         ) {
-            Text(text = "1")
-            Text(text = "0")
+            Text("%.2f".format(Locale.ROOT, maxY))
+            Text("%.0f".format(minY))
         }
     }
 
     @Composable
     fun printHorizontalLabels() {
+        var minX by remember { mutableStateOf( 0f ) }
+        var maxX by remember { mutableStateOf( 0f ) }
         Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().drawBehind {
+                minX = getMinX()
+                maxX = getMaxX()
+            }
         ) {
-            Text("-3")
-            Text("3")
+            Text("%.0f".format(minX))
+            Text("%.0f".format(maxX))
         }
     }
 
     @Composable
     fun createDistributionChart(distribution: Distribution) {
-        Column(
-            Modifier
+        Column(modifier = Modifier
                 .padding(10.dp)
                 .border(width = 1.dp, color = Color.Black)
                 .padding(5.dp)
-                .width(IntrinsicSize.Min)
-        ) {
-            Row(Modifier.height(IntrinsicSize.Min)) {
-                printVerticalLabels()
+                .width(IntrinsicSize.Min)) {
+            Row(
+                modifier = Modifier.height(IntrinsicSize.Min)
+            ) {
                 printChart(distribution, 0f, 1f)
+                printVerticalLabels()
             }
             printHorizontalLabels()
         }
