@@ -9,7 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 
 object Typography {
-    val mainFont = Font(
+    private val mainFont = Font(
         resource = "linbiolinum_sansserif-bold.ttf",
         weight = FontWeight.W400,
         style = FontStyle.Normal

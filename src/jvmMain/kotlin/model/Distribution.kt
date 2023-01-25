@@ -52,7 +52,27 @@ class Gauss(private val u: Float, private val s: Float): Distribution {
     override fun standardDeviation() = s
 }
 
-class MaxwellBoltzmann()
+class MaxwellBoltzmann(): Distribution {
+    var E = 0
+    var g = 0
+    var n = 0
+    var Z = 1
+    var T = 300
+    var u = 1
+
+    override fun probabilityDensityFunction(x: Int): Float {
+        TODO("Not yet implemented")
+    }
+
+    override fun mean(): Float {
+        TODO("Not yet implemented")
+    }
+
+    override fun standardDeviation(): Float {
+        TODO("Not yet implemented")
+    }
+}
+
 
 class BoseEinstein()
 

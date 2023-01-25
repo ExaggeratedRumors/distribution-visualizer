@@ -89,7 +89,6 @@ class AppLayout {
             ExtendedFloatingActionButton(
                 onClick = { chosenDistribution.value = if (chosenDistribution.value == "None") "Gaussian" else "None" },
                 text = { Text(text = "Change distribution") }
-
             )
         }
     }

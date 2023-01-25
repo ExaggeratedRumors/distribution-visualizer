@@ -69,7 +69,10 @@ class AppWindow {
     @Composable
     private fun createWindow() {
         Surface(
-            modifier = Modifier.fillMaxSize().padding(0.dp, 40.dp, 0.dp, 0.dp).shadow(15.dp, RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp), true),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(0.dp, 40.dp, 0.dp, 0.dp)
+                .shadow(15.dp, RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp), true),
             color = Theme.colorPalette.secondary,
             shape = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp)
         ) { AppLayout().twoColumnsLayout() }
