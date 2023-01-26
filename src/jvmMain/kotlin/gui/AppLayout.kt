@@ -42,7 +42,7 @@ class AppLayout {
         ) {
             Row {
                 Text (text = "Chosen distribution: ${chosenDistribution.value}", modifier = Modifier.weight(1f))
-                Text (text = "Left Pane Second Text Box", modifier = Modifier.weight(1f))
+                Text (text = "Distribution chart", modifier = Modifier.weight(1f))
             }
 
             Spacer (Modifier.size(20.dp))
