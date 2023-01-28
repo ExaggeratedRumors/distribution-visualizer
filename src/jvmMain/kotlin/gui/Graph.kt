@@ -45,7 +45,7 @@ class Graph {
                     }.map {
                         Point(
                             it,
-                            distribution.probabilityDensityFunction(it.toInt()))
+                            distribution.probabilityDensityFunction(it))
                     }.let {
                         scale[0][0] = it.minOf { v -> v.x }
                         scale[0][1] = it.maxOf { v -> v.x }
