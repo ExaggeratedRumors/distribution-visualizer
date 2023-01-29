@@ -3,7 +3,7 @@ package model
 import kotlin.math.*
 
 interface Distribution {
-    fun takeRange(): List<Float>
+    fun range(): List<Float>
     fun probabilityDensityFunction(x: Float): Float
     fun mean(): Float
     fun standardDeviation(): Float
@@ -15,7 +15,7 @@ class Continuous(private val a: Float, private val b: Float): Distribution {
             "First node must be lower than second"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
         (a - 10) + it / ((b + 10) - (a - 10))
     }
     override fun probabilityDensityFunction(x: Float) =
@@ -30,7 +30,7 @@ class Binomial(private val p: Float, private val n: Int): Distribution {
             "Probability must be in range [0,1] and amount must be positive"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
         1f * it / n
     }
     override fun probabilityDensityFunction(x: Float): Float {
@@ -49,7 +49,7 @@ class Geometric(private val p: Float): Distribution {
             "Probability must be in range [0,1]"
         }
     }
-    override fun takeRange() = (1..100).map {
+    override fun range() = (1..100).map {
         it * p
     }
     override fun probabilityDensityFunction(x: Float) =
@@ -64,7 +64,7 @@ class Exponential(private val lambda: Float): Distribution {
             "Lambda parameter must be greater than 0"
         }
     }
-    override fun takeRange() = (1..100).map {
+    override fun range() = (1..100).map {
         it / (lambda * 5)
     }
     override fun probabilityDensityFunction(x: Float) = lambda * exp(-lambda * x)
@@ -78,7 +78,7 @@ class Poisson(private val lambda: Float): Distribution {
             "Lambda parameter must be greater than 0"
         }
     }
-    override fun takeRange() = (1..100).map {
+    override fun range() = (1..100).map {
         it / (2 * lambda)
     }
     override fun probabilityDensityFunction(x: Float): Float {
@@ -95,7 +95,7 @@ class Pareto(private val xm: Float, private val alpha: Float) : Distribution {
             "Mode and alpha parameter must be higher than 0"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
        1 + it * alpha / 10
     }
     override fun probabilityDensityFunction(x: Float) =
@@ -112,7 +112,7 @@ class Gauss(private val mean: Float, private val sigma: Float): Distribution {
             "Sigma must be higher than 0"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
         (mean - 4 * sigma) + it / (8 * sigma)
     }
     override fun probabilityDensityFunction(x: Float) =
@@ -128,7 +128,7 @@ class LogNormal(private val mean: Float, private val sigma: Float): Distribution
             "Sigma must be higher than 0"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
         it / (50 * sigma)
     }
     override fun probabilityDensityFunction(x: Float) =
@@ -145,7 +145,7 @@ class Gumbel(private val mean: Float, private val beta: Float): Distribution {
             "Beta must be higher than 0"
         }
     }
-    override fun takeRange() = (0..100).map {
+    override fun range() = (0..100).map {
         it / (beta * 10)
     }
     override fun probabilityDensityFunction(x: Float): Float {

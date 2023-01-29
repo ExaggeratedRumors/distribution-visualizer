@@ -33,16 +33,14 @@ class Graph {
     ) = min2 + (this - min1) * (max2 - min2) / (max1 - min1)
 
     @Composable
-    fun printChart(distribution: Distribution, min: Float, max: Float) {
+    fun printChart(distribution: Distribution) {
         var tooltipValue by remember { mutableStateOf("x:\ny:") }
 
         Box(modifier = Modifier
             .size(300.dp, 200.dp)
             .drawBehind {
                 val function =
-                    (0..100).map {
-                        min + it / (max - min)
-                    }.map {
+                    distribution.range().map {
                         Point(
                             it,
                             distribution.probabilityDensityFunction(it))
@@ -121,7 +119,7 @@ class Graph {
             Row(
                 modifier = Modifier.height(IntrinsicSize.Min)
             ) {
-                printChart(distribution, 0f, 1f)
+                printChart(distribution)
                 printVerticalLabels()
             }
             printHorizontalLabels()
