@@ -11,7 +11,7 @@ import model.Distribution
 //class for frame, labels and grid of parameters taken from graph
 class PlotPane {
     @Composable
-    fun createPlotPane(distribution: Distribution) {
+    fun distributionPlot(distribution: Distribution) {
         val graph = Graph()
         Column(modifier = Modifier
             .padding(10.dp)

@@ -53,9 +53,9 @@ class AppLayout {
                     .background(color = Theme.colorPalette.onSurface),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val graph = Graph()
+                val plotPane = PlotPane()
                 val testDis = Gauss(50f, 10f)
-                graph.createDistributionChart(testDis)
+                plotPane.distributionPlot(testDis)
             }
             Spacer (Modifier.size(20.dp))
             Row (verticalAlignment = Alignment.CenterVertically) {
