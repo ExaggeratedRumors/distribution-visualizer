@@ -28,6 +28,7 @@ class AppWindow {
             state = state,
             resizable = false
         ) {
+            Theme.VisualizerTheme {  }
             createWindow()
             createAppWindowBar()
         }

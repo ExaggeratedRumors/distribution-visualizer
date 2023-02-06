@@ -17,7 +17,7 @@ object Theme {
         background = Color(110, 52, 109)
     )
 
-    val shapes = Shapes(
+    private val shapes = Shapes(
         small = RoundedCornerShape(4.dp),
         medium = RoundedCornerShape(4.dp),
         large = RoundedCornerShape(0.dp)
