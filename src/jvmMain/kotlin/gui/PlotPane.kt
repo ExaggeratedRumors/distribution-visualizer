@@ -7,9 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import model.Distribution
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.round
+import kotlin.math.*
 
 //class for frame, labels and grid of parameters taken from graph
 class PlotPane {
@@ -31,8 +29,7 @@ class PlotPane {
         }
     }
 
-    fun createGrid(minX: Float, maxX: Float, minY: Float, maxY: Float) {
-        var diffX = maxX - minX
+    fun createYGrid(minY: Float, maxY: Float) : List<Float> {
         var diffY = maxY - minY
         var dy = 0f
         var dx = 0f
@@ -46,14 +43,26 @@ class PlotPane {
                     r += 1
                 } while(floor(dy) == 0f)
                 dy = round(dy)
-                dy /= r
+                dy /= 10f.pow(r)
 
                 it.map { v ->
                     var nv = v
+                    var rv = 0
                     do {
                         nv *= 10f
+                        rv += 1
                     } while(floor(nv) == 0f)
+                    nv = round(nv)
+                    nv /= 10f.pow(rv)
+                    nv
                 }
             }
+        return yRange
     }
+
+    fun createGrid(minX: Float, maxX: Float, minY: Float, maxY: Float) =
+        Pair(
+            createYGrid(minY, maxY),
+            createYGrid(minX, maxX)
+        )
 }

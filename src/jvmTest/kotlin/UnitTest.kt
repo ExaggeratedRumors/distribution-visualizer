@@ -1,23 +1,13 @@
 import org.junit.Test
+import kotlin.test.*
 import gui.*
-
-fun main() {
-    val unitTest = UnitTest()
-    unitTest.calculations()
-}
 
 class UnitTest {
     @Test
-    fun calculations() {
-        val amt = 10
-        val c = (0f..amt.toFloat())
-        println(c)
-    }
-
-    @Test
     fun `grid data create`() {
         val pp = PlotPane()
-        val output = pp.createGrid(0f,1f,0f,5f)
-        print(output)
+        val output = pp.createYGrid(0.5f,0.75f)
+        val expected = listOf(0.55f, 0.6f, 0.65f, 0.7f, 0.75f)
+        assertEquals(expected, output)
     }
 }
