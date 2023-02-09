@@ -37,11 +37,22 @@ class PlotPane {
         var dy = 0f
         var dx = 0f
         val yRange = (1..5)
-            .map { minY + diffY * it / 5 }
+            .map { minY + (maxY - minY) * it / 5 }
             .let {
-                dy = it[0]
-                while(floor(dy) == 0f) {
+                dy = it[1] - it[0]
+                var r = 0
+                do {
                     dy *= 10f
+                    r += 1
+                } while(floor(dy) == 0f)
+                dy = round(dy)
+                dy /= r
+
+                it.map { v ->
+                    var nv = v
+                    do {
+                        nv *= 10f
+                    } while(floor(nv) == 0f)
                 }
             }
     }
