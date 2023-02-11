@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -64,20 +65,8 @@ class Graph {
                 function.drop(0).forEach { graphPath.lineTo(it.x, it.y) }
                 drawPath(graphPath, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
 
-                val gridPath = Path()
-                val gridY = discretization(scale[1][0], scale[1][1])
-                gridY.forEach {
-                    gridPath.moveTo(it, scale[3][1])
-                    gridPath.lineTo(it, scale[3][0])
-                }
-                drawPath(graphPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
-                val gridX = discretization(scale[0][0], scale[0][1])
-                gridX.forEach {
-                    gridPath.moveTo(it, scale[2][0])
-                    gridPath.lineTo(it, scale[2][1])
-                }
-                drawPath(graphPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
-
+                createGrid(scale[1][0], scale[1][1], scale[3][1], scale[3][0])
+                createGrid(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
             }.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while(true) {
@@ -100,9 +89,13 @@ class Graph {
             .filter { it in minY..maxY }
     }
 
-    fun createGrid() =
-        Pair(
-            discretization(scale[1][0], scale[1][1]),
-            discretization(scale[0][0], scale[0][1])
-        )
+    private fun DrawScope.createGrid(minVal: Float, maxVal: Float, windowStart: Float, windowEnd: Float) {
+        val gridPath = Path()
+        val gridY = discretization(scale[1][0], scale[1][1])
+        gridY.forEach {
+            gridPath.moveTo(it, scale[3][1])
+            gridPath.lineTo(it, scale[3][0])
+        }
+        drawPath(gridPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
+    }
 }
