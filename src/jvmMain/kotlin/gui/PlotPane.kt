@@ -29,40 +29,17 @@ class PlotPane {
         }
     }
 
-    fun createYGrid(minY: Float, maxY: Float) : List<Float> {
-        var diffY = maxY - minY
-        var dy = 0f
-        var dx = 0f
-        val yRange = (1..5)
-            .map { minY + (maxY - minY) * it / 5 }
-            .let {
-                dy = it[1] - it[0]
-                var r = 0
-                do {
-                    dy *= 10f
-                    r += 1
-                } while(floor(dy) == 0f)
-                dy = round(dy)
-                dy /= 10f.pow(r)
-
-                it.map { v ->
-                    var nv = v
-                    var rv = 0
-                    do {
-                        nv *= 10f
-                        rv += 1
-                    } while(floor(nv) == 0f)
-                    nv = round(nv)
-                    nv /= 10f.pow(rv)
-                    nv
-                }
-            }
-        return yRange
+    fun discretization(minY: Float, maxY: Float): List<Float> {
+        require(maxY > minY)
+        val orderOfMagnitude = 10.0.pow(floor(ln((maxY - minY).toDouble()) * 0.4343))
+        return (1..10)
+            .map { (it * orderOfMagnitude).toFloat() }
+            .filter { it in minY..maxY }
     }
 
     fun createGrid(minX: Float, maxX: Float, minY: Float, maxY: Float) =
         Pair(
-            createYGrid(minY, maxY),
-            createYGrid(minX, maxX)
+            discretization(minY, maxY),
+            discretization(minX, maxX)
         )
 }
