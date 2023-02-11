@@ -1,12 +1,10 @@
 package gui
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -14,16 +12,18 @@ import androidx.compose.ui.unit.dp
 import model.Distribution
 import java.lang.Float.max
 import java.util.*
+import kotlin.math.floor
+import kotlin.math.ln
+import kotlin.math.pow
 
 data class Point(val x: Float, val y: Float)
 
 class Graph {
-    private val scale = Array(4) { FloatArray(2) }
-
-    private fun getMinX() = scale[0][0]
-    private fun getMaxX() = scale[0][1]
-    private fun getMinY() = scale[1][0]
-    private fun getMaxY() = scale[1][1]
+    /*
+    xMin xMax widthMin widthMax
+    yMin yMax heightMax heightMin
+     */
+    val scale = Array(4) { FloatArray(2) }
 
     private fun Float.rescale(
         min1: Float,
@@ -59,10 +59,25 @@ class Graph {
                             Point(x, y)
                         }
                     }
-                val path = Path()
-                path.moveTo(function[0].x, function[0].y)
-                function.drop(0).forEach { path.lineTo(it.x, it.y) }
-                drawPath(path, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
+                val graphPath = Path()
+                graphPath.moveTo(function[0].x, function[0].y)
+                function.drop(0).forEach { graphPath.lineTo(it.x, it.y) }
+                drawPath(graphPath, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
+
+                val gridPath = Path()
+                val gridY = discretization(scale[1][0], scale[1][1])
+                gridY.forEach {
+                    gridPath.moveTo(it, scale[3][1])
+                    gridPath.lineTo(it, scale[3][0])
+                }
+                drawPath(graphPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
+                val gridX = discretization(scale[0][0], scale[0][1])
+                gridX.forEach {
+                    gridPath.moveTo(it, scale[2][0])
+                    gridPath.lineTo(it, scale[2][1])
+                }
+                drawPath(graphPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
+
             }.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while(true) {
@@ -77,52 +92,17 @@ class Graph {
         }
     }
 
-    @Composable
-    fun printVerticalLabels() {
-        var minY by remember { mutableStateOf( 0f ) }
-        var maxY by remember { mutableStateOf( 0f ) }
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxHeight().drawBehind {
-                minY = getMinY()
-                maxY = getMaxY()
-            }
-        ) {
-            Text("%.2f".format(Locale.ROOT, maxY))
-            Text("%.0f".format(minY))
-        }
+    fun discretization(minY: Float, maxY: Float): List<Float> {
+        require(maxY > minY)
+        val orderOfMagnitude = 10.0.pow(floor(ln((maxY - minY).toDouble()) * 0.4343))
+        return (1..10)
+            .map { (it * orderOfMagnitude).toFloat() }
+            .filter { it in minY..maxY }
     }
 
-    @Composable
-    fun printHorizontalLabels() {
-        var minX by remember { mutableStateOf( 0f ) }
-        var maxX by remember { mutableStateOf( 0f ) }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().drawBehind {
-                minX = getMinX()
-                maxX = getMaxX()
-            }
-        ) {
-            Text("%.0f".format(minX))
-            Text("%.0f".format(maxX))
-        }
-    }
-
-    @Composable
-    fun createDistributionChart(distribution: Distribution) {
-        Column(modifier = Modifier
-                .padding(10.dp)
-                .border(width = 1.dp, color = Color.Black)
-                .padding(5.dp)
-                .width(IntrinsicSize.Min)) {
-            Row(
-                modifier = Modifier.height(IntrinsicSize.Min)
-            ) {
-                printChart(distribution)
-                printVerticalLabels()
-            }
-            printHorizontalLabels()
-        }
-    }
+    fun createGrid() =
+        Pair(
+            discretization(scale[1][0], scale[1][1]),
+            discretization(scale[0][0], scale[0][1])
+        )
 }

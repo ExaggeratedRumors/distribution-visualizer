@@ -2,18 +2,22 @@ package gui
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import model.Distribution
+import java.util.*
 import kotlin.math.*
 
 //class for frame, labels and grid of parameters taken from graph
 class PlotPane {
+    private val graph: Graph = Graph()
+
     @Composable
     fun distributionPlot(distribution: Distribution) {
-        val graph = Graph()
         Column(modifier = Modifier
             .padding(10.dp)
             .border(width = 1.dp, color = Color.Black)
@@ -23,23 +27,41 @@ class PlotPane {
                 modifier = Modifier.height(IntrinsicSize.Min)
             ) {
                 graph.printChart(distribution)
-                graph.printVerticalLabels()
+                printVerticalLabels()
             }
-            graph.printHorizontalLabels()
+            printHorizontalLabels()
         }
     }
 
-    fun discretization(minY: Float, maxY: Float): List<Float> {
-        require(maxY > minY)
-        val orderOfMagnitude = 10.0.pow(floor(ln((maxY - minY).toDouble()) * 0.4343))
-        return (1..10)
-            .map { (it * orderOfMagnitude).toFloat() }
-            .filter { it in minY..maxY }
+    @Composable
+    fun printVerticalLabels() {
+        var minY by remember { mutableStateOf( 0f ) }
+        var maxY by remember { mutableStateOf( 0f ) }
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxHeight().drawBehind {
+                minY = graph.scale[1][0]
+                maxY = graph.scale[1][1]
+            }
+        ) {
+            Text("%.2f".format(Locale.ROOT, maxY))
+            Text("%.0f".format(minY))
+        }
     }
 
-    fun createGrid(minX: Float, maxX: Float, minY: Float, maxY: Float) =
-        Pair(
-            discretization(minY, maxY),
-            discretization(minX, maxX)
-        )
+    @Composable
+    fun printHorizontalLabels() {
+        var minX by remember { mutableStateOf(0f) }
+        var maxX by remember { mutableStateOf(0f) }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().drawBehind {
+                minX = graph.scale[0][0]
+                maxX = graph.scale[0][1]
+            }
+        ) {
+            Text("%.0f".format(minX))
+            Text("%.0f".format(maxX))
+        }
+    }
 }
