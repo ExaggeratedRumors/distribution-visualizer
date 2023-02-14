@@ -21,8 +21,8 @@ data class Point(val x: Float, val y: Float)
 
 class Graph {
     /*
-    xMin xMax widthMin widthMax
-    yMin yMax heightMax heightMin
+        xMin xMax widthMin widthMax
+        yMin yMax heightMax heightMin
      */
     val scale = Array(4) { FloatArray(2) }
 
@@ -81,7 +81,7 @@ class Graph {
         }
     }
 
-    fun discretization(minY: Float, maxY: Float): List<Float> {
+    private fun discretization(minY: Float, maxY: Float): List<Float> {
         require(maxY > minY)
         val orderOfMagnitude = 10.0.pow(floor(ln((maxY - minY).toDouble()) * 0.4343))
         return (1..10)
