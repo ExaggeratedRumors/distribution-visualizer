@@ -5,7 +5,7 @@ import gui.*
 class UnitTest {
     @Test
     fun `grid data create`() {
-        val pp = PlotPane()
+        val pp = Graph()
         val o1 = pp.discretization(0.5f,0.75f)
         val e1 = listOf(0.5f, 0.6f, 0.7f)
         assertEquals(e1, o1)

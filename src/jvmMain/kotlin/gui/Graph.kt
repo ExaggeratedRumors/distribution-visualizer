@@ -81,7 +81,7 @@ class Graph {
         }
     }
 
-    private fun discretization(minY: Float, maxY: Float): List<Float> {
+    fun discretization(minY: Float, maxY: Float): List<Float> {
         require(maxY > minY)
         val orderOfMagnitude = 10.0.pow(floor(ln((maxY - minY).toDouble()) * 0.4343))
         return (1..10)
