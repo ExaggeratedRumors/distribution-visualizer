@@ -65,15 +65,15 @@ class Graph {
                 function.drop(0).forEach { graphPath.lineTo(it.x, it.y) }
                 drawPath(graphPath, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
 
-                createGrid(scale[1][0], scale[1][1], scale[3][1], scale[3][0])
-                createGrid(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
+                //createGrid(scale[1][0], scale[1][1], scale[3][1], scale[3][0])
+                //createGrid(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
             }.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while(true) {
                         val position = awaitPointerEvent().changes.first().position
-                        val x = max(0f, position.x.rescale(scale[2][0], scale[2][1], scale[0][0], scale[0][1]))
-                        val y = max(0f, position.y.rescale(scale[3][0], scale[3][1], scale[1][0], scale[1][1]))
-                        tooltipValue = "x: %.0f".format(x) + "\ny: %.2f".format(Locale.ROOT, y)
+                        val x = position.x.rescale(scale[2][0], scale[2][1], scale[0][0], scale[0][1])
+                        val y = position.y.rescale(scale[3][0], scale[3][1], scale[1][0], scale[1][1])
+                        tooltipValue = "x: %.1f".format(Locale.ROOT, x) + "\ny: %.2f".format(Locale.ROOT, y)
                     }
                 }
             }) {

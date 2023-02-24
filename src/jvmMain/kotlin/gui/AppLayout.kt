@@ -54,7 +54,7 @@ class AppLayout {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val plotPane = PlotPane()
-                val testDis = Gauss(50f, 10f)
+                val testDis = Gauss(0f, 1f)
                 plotPane.distributionPlot(testDis)
             }
             Spacer (Modifier.size(20.dp))

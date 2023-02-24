@@ -113,7 +113,7 @@ class Gauss(private val mean: Float, private val sigma: Float): Distribution {
         }
     }
     override fun range() = (0..100).map {
-        (mean - 4 * sigma) + it / (8 * sigma)
+        mean + sigma * (50 - it) / 10
     }
     override fun probabilityDensityFunction(x: Float) =
         (1 / sigma * sqrt(2 * PI) * exp( -0.5 * ((x - mean) / sigma).pow(2)))
