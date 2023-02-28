@@ -65,8 +65,8 @@ class Graph {
                 function.drop(0).forEach { graphPath.lineTo(it.x, it.y) }
                 drawPath(graphPath, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
 
-                //createGrid(scale[1][0], scale[1][1], scale[3][1], scale[3][0])
-                //createGrid(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
+                createGrid(scale[1][0], scale[1][1], scale[3][1], scale[3][0])
+                createGrid(scale[0][0], scale[0][1], scale[2][0], scale[2][1])
             }.pointerInput(Unit) {
                 awaitPointerEventScope {
                     while(true) {
