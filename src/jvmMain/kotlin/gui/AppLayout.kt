@@ -55,7 +55,7 @@ class AppLayout {
             ) {
                 val plotPane = PlotPane()
                 val testDis = Gauss(0f, 1f)
-                plotPane.distributionPlot(testDis)
+                plotPane.printPlot(testDis)
             }
             Spacer (Modifier.size(20.dp))
             Row (verticalAlignment = Alignment.CenterVertically) {
