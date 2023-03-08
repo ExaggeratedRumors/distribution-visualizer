@@ -4,14 +4,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
@@ -35,29 +34,19 @@ class PlotPane {
     @Composable
     fun printPlot(distribution: Distribution) {
         Column(modifier = Modifier
-            .padding(10.dp)
-            .border(width = 1.dp, color = Color.Black)
-            .padding(5.dp)
-            .width(IntrinsicSize.Min)
+            .padding(top = 20.dp, bottom = 0.dp),
         ) {
-            var tooltipValue by remember { mutableStateOf("x:\ny:") }
-            Row(
-                modifier = Modifier
-                    .size(300.dp,200.dp)
-                    .height(IntrinsicSize.Min)
-                    .drawBehind {
-                        printGraph(distribution)
-                        printGrid(xMin, xMax, widthMin, widthMax)
-                        printGrid(yMin, yMax, heightMax, heightMin)
-                    }.pointerInput(Unit) {
-                        printTooltip { tooltipValue = it }
-                    }
-            ) {
+            Row {
                 printVerticalLabels()
-                Text(tooltipValue)
+                printChartScape(distribution)
+                Column (modifier = Modifier
+                    .padding(3.dp)
+                    .width(IntrinsicSize.Min)
+                    .size(28.dp,200.dp)
+                ){ }
             }
-            printHorizontalLabels()
         }
+        printHorizontalLabels()
     }
 
     private fun Float.rescale(
@@ -67,11 +56,10 @@ class PlotPane {
         max2: Float
     ) = min2 + (this - min1) * (max2 - min2) / (max1 - min1)
 
-    private fun DrawScope.printGraph(distribution: Distribution) {
-        val function = distribution.range().map {
-            Point(
-                it,
-                distribution.probabilityDensityFunction(it))
+    private fun DrawScope.scaleDistribution(distribution: Distribution) = distribution
+        .range()
+        .map {
+            Point(it, distribution.probabilityDensityFunction(it))
         }.let {
             xMin = it.minOf { v -> v.x }
             xMax = it.maxOf { v -> v.x }
@@ -87,10 +75,38 @@ class PlotPane {
                 Point(x, y)
             }
         }
+
+    private fun DrawScope.printGraph(function: List<Point>) {
         val graphPath = Path()
         graphPath.moveTo(function[0].x, function[0].y)
         function.drop(0).forEach { graphPath.lineTo(it.x, it.y) }
         drawPath(graphPath, color = Theme.colorPalette.primary, style = Stroke(width = 3f))
+    }
+
+    private fun DrawScope.printGrid() {
+        val gridPath = Path()
+        val orderOfMagnitudeX = 10.0.pow(floor(ln((xMax - xMin - 1).toDouble()) * 0.4343))
+        (-5..5)
+            .map { (it * orderOfMagnitudeX).toFloat() }
+            .filter { it in xMin..xMax }
+            .map { it.rescale(xMin, xMax, widthMin, widthMax) }
+            .forEach {
+                gridPath.moveTo(it, heightMax)
+                gridPath.lineTo(it, heightMin)
+            }
+        drawPath(gridPath, color = Theme.colorPalette.onBackground, style = Stroke(width = 1f))
+
+        gridPath.reset()
+        val orderOfMagnitudeY = 10.0.pow(floor(ln((yMax - yMin - 1).toDouble()) * 0.4343))
+        (0..10)
+            .map { (it * orderOfMagnitudeY).toFloat() }
+            .filter { it in yMin..yMax }
+            .map { it.rescale(yMin, yMax, heightMax, heightMin) }
+            .forEach {
+                gridPath.moveTo(widthMin, it)
+                gridPath.lineTo(widthMax, it)
+            }
+        drawPath(gridPath, color = Theme.colorPalette.onBackground, style = Stroke(width = 1f))
     }
 
     private suspend fun PointerInputScope.printTooltip(
@@ -106,32 +122,45 @@ class PlotPane {
         }
     }
 
-    private fun DrawScope.printGrid(minVal: Float, maxVal: Float, windowStart: Float, windowEnd: Float) {
-        val gridPath = Path()
-        val orderOfMagnitude = 10.0.pow(floor(ln((maxVal - minVal).toDouble()) * 0.4343))
-        (1..10)
-            .map { (it * orderOfMagnitude).toFloat() }
-            .filter { it in minVal..maxVal }
-            .forEach {
-                gridPath.moveTo(it, windowStart)
-                gridPath.lineTo(it, windowEnd)
-            }
-        drawPath(gridPath, color = Theme.colorPalette.secondary, style = Stroke(width = 1f))
+    @Composable
+    fun printChartScape(distribution: Distribution) {
+        var tooltipValue by remember { mutableStateOf("x:\ny:") }
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .size(250.dp,200.dp)
+                .height(IntrinsicSize.Min)
+                .border(width = 1.dp, color = Color.Black)
+                .padding(3.dp)
+                .drawBehind {
+                    val scaledDistribution = scaleDistribution(distribution)
+                    printGrid()
+                    printGraph(scaledDistribution)
+                }.pointerInput(Unit) {
+                    printTooltip { tooltipValue = it }
+                }
+        ) {
+            Text(tooltipValue)
+        }
     }
-
     @Composable
     fun printVerticalLabels() {
         var minY by remember { mutableStateOf( 0f ) }
         var maxY by remember { mutableStateOf( 0f ) }
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxHeight().drawBehind {
-                minY = yMin
-                maxY = yMax
-            }
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .padding(3.dp)
+                .width(IntrinsicSize.Min)
+                .size(28.dp,200.dp)
+                .drawBehind {
+                    minY = yMin
+                    maxY = yMax
+                }
         ) {
             Text("%.2f".format(Locale.ROOT, maxY))
-            Text("%.0f".format(minY))
+            Text("%.2f".format(Locale.ROOT,minY))
         }
     }
 
@@ -141,13 +170,16 @@ class PlotPane {
         var maxX by remember { mutableStateOf(0f) }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().drawBehind {
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier
+                .size(280.dp,30.dp)
+                .drawBehind {
                 minX = xMin
                 maxX = xMax
             }
         ) {
-            Text("%.0f".format(minX))
-            Text("%.0f".format(maxX))
+            Text("%.2f".format(Locale.ROOT,minX))
+            Text("%.2f".format(Locale.ROOT,maxX))
         }
     }
 }
