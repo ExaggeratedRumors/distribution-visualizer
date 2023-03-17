@@ -32,7 +32,7 @@ class PlotPane {
     }
 
     @Composable
-    fun printPlot(distribution: Distribution) {
+    fun printPlotPane(distribution: Distribution) {
         Column(modifier = Modifier
             .padding(top = 20.dp, bottom = 0.dp),
         ) {

@@ -2,14 +2,14 @@ package model
 
 import kotlin.math.*
 
-interface Distribution {
+sealed interface Distribution {
     fun range(): List<Float>
     fun probabilityDensityFunction(x: Float): Float
     fun mean(): Float
     fun standardDeviation(): Float
 }
 
-class Continuous(private val a: Float, private val b: Float): Distribution {
+class Continuous(private val a: Float = 1f, private val b: Float = 2f): Distribution {
     init {
         require(a < b) {
             "First node must be lower than second"
@@ -24,9 +24,9 @@ class Continuous(private val a: Float, private val b: Float): Distribution {
     override fun standardDeviation() = (b - a) / sqrt(12f)
 }
 
-class Binomial(private val p: Float, private val n: Int): Distribution {
+class Binomial(private val p: Float = 1f, private val n: Int = 20): Distribution {
     init {
-        require(p in 0.0..1.0 && n >= 0) {
+        require(p in 0.0..1.0 && n >= 2) {
             "Probability must be in range [0,1] and amount must be positive"
         }
     }
@@ -34,16 +34,16 @@ class Binomial(private val p: Float, private val n: Int): Distribution {
         1f * it / n
     }
     override fun probabilityDensityFunction(x: Float): Float {
-        val nf = (1..n).reduce { v, w -> v * w }
-        val xf = (1..x.toInt()).reduce { v, w -> v * w }
-        val nkf = (1 .. (n - x.toInt())).reduce { v, w -> v * w }
+        val nf = factorial(n)
+        val xf = factorial(x.toInt())
+        val nkf = factorial((n - x.toInt()))
         return nf / (xf * nkf) * p.pow(x) * (1 - p).pow(n - x)
     }
     override fun mean() = n * p
     override fun standardDeviation() = sqrt(n * p * (1 - p))
 }
 
-class Geometric(private val p: Float): Distribution {
+class Geometric(private val p: Float = 0f): Distribution {
     init {
         require(p in 0.0..1.0) {
             "Probability must be in range [0,1]"
@@ -58,7 +58,7 @@ class Geometric(private val p: Float): Distribution {
     override fun standardDeviation() = sqrt(1 - p) / p
 }
 
-class Exponential(private val lambda: Float): Distribution {
+class Exponential(private val lambda: Float = 1f): Distribution {
     init {
         require(lambda > 0) {
             "Lambda parameter must be greater than 0"
@@ -72,24 +72,24 @@ class Exponential(private val lambda: Float): Distribution {
     override fun standardDeviation() = 1 / lambda
 }
 
-class Poisson(private val lambda: Float): Distribution {
+class Poisson(private val lambda: Float = 1f): Distribution {
     init {
         require(lambda > 0) {
             "Lambda parameter must be greater than 0"
         }
     }
-    override fun range() = (1..100).map {
-        it / (2 * lambda)
+    override fun range() = (1..2 * lambda.toInt()).map {
+        it * 1f
     }
     override fun probabilityDensityFunction(x: Float): Float {
-        val xf = (1..x.toInt()).reduce { v, w -> v * w }
+        val xf = factorial(x.toInt())
         return lambda.pow(x) * exp(-lambda) / xf
     }
     override fun mean() = lambda
     override fun standardDeviation() = sqrt(lambda)
 }
 
-class Pareto(private val xm: Float, private val alpha: Float) : Distribution {
+class Pareto(private val xm: Float = 1f, private val alpha: Float = 1f) : Distribution {
     init {
         require(xm > 0 && alpha > 0) {
             "Mode and alpha parameter must be higher than 0"
@@ -106,7 +106,7 @@ class Pareto(private val xm: Float, private val alpha: Float) : Distribution {
         if (alpha <= 2) Float.POSITIVE_INFINITY else xm * sqrt(alpha) / ((alpha - 1) * sqrt(alpha - 2))
 }
 
-class Gauss(private val mean: Float, private val sigma: Float): Distribution {
+class Gauss(private val mean: Float = 0f, private val sigma: Float = 1f): Distribution {
     init {
         require(sigma > 0) {
             "Sigma must be higher than 0"
@@ -122,7 +122,7 @@ class Gauss(private val mean: Float, private val sigma: Float): Distribution {
     override fun standardDeviation() = sigma
 }
 
-class LogNormal(private val mean: Float, private val sigma: Float): Distribution {
+class LogNormal(private val mean: Float = 0f, private val sigma: Float = 1f): Distribution {
     init {
         require(sigma > 0) {
             "Sigma must be higher than 0"
@@ -139,7 +139,7 @@ class LogNormal(private val mean: Float, private val sigma: Float): Distribution
         sqrt(exp(sigma.pow(2) - 1) * exp(2 * mean + sigma.pow(2)))
 }
 
-class Gumbel(private val mean: Float, private val beta: Float): Distribution {
+class Gumbel(private val mean: Float = 0f, private val beta: Float = 1f): Distribution {
     init {
         require(beta > 0) {
             "Beta must be higher than 0"
