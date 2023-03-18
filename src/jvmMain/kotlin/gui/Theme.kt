@@ -10,17 +10,19 @@ import androidx.compose.ui.unit.dp
 
 object Theme {
     val colorPalette = darkColors(
-        primary = Color(112, 54, 111),
-        surface = Color(110, 52, 109),
+        primary = Color(79, 67, 103),
+        surface = Color(77, 65, 102),
         onSurface = Color(199, 211, 221),
-        secondary = Color(53, 64, 118),
-        background = Color(110, 52, 109)
+        secondary = Color(27, 26, 36),
+        background = Color(40, 40, 57),
+        onPrimary = Color.White,
+        onSecondary = Color.White
     )
 
-    private val shapes = Shapes(
-        small = RoundedCornerShape(4.dp),
+    val shapes = Shapes(
+        small = RoundedCornerShape(8.dp),
         medium = RoundedCornerShape(4.dp),
-        large = RoundedCornerShape(0.dp)
+        large = RoundedCornerShape(1.dp)
     )
 
     @Composable

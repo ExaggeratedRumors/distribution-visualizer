@@ -50,6 +50,7 @@ class AppWindow {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.width(150.dp),
                         fontFamily = Typography.mainTypography.body1.fontFamily,
+                        color = Theme.colorPalette.onPrimary
                     )
                     Spacer(Modifier.size(200.dp))
                     Button(onClick = {

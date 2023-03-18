@@ -16,7 +16,7 @@ class Continuous(private val a: Float = 1f, private val b: Float = 2f): Distribu
         }
     }
     override fun range() = (0..100).map {
-        (a - 10) + it / ((b + 10) - (a - 10))
+        - 1 + a + (b - a + 2) * it / 100
     }
     override fun probabilityDensityFunction(x: Float) =
         if(x < a || x > b) 0f else 1 / (b - a)
@@ -24,16 +24,17 @@ class Continuous(private val a: Float = 1f, private val b: Float = 2f): Distribu
     override fun standardDeviation() = (b - a) / sqrt(12f)
 }
 
-class Binomial(private val p: Float = 1f, private val n: Int = 20): Distribution {
+class Binomial(private val p: Float = 0.5f, private val n: Int = 10): Distribution {
     init {
         require(p in 0.0..1.0 && n >= 2) {
             "Probability must be in range [0,1] and amount must be positive"
         }
     }
     override fun range() = (0..100).map {
-        1f * it / n
+        -1 + 1f * (n + 2) * it / 100
     }
     override fun probabilityDensityFunction(x: Float): Float {
+        if(x < 0 || x > n) return 0f
         val nf = factorial(n)
         val xf = factorial(x.toInt())
         val nkf = factorial((n - x.toInt()))
@@ -43,14 +44,14 @@ class Binomial(private val p: Float = 1f, private val n: Int = 20): Distribution
     override fun standardDeviation() = sqrt(n * p * (1 - p))
 }
 
-class Geometric(private val p: Float = 0f): Distribution {
+class Geometric(private val p: Float = 0.5f): Distribution {
     init {
         require(p in 0.0..1.0) {
             "Probability must be in range [0,1]"
         }
     }
-    override fun range() = (1..100).map {
-        it * p
+    override fun range() = (0..100).map {
+        it / exp(p + 1)
     }
     override fun probabilityDensityFunction(x: Float) =
         p * (1 - p).pow(x - 1)
@@ -64,8 +65,8 @@ class Exponential(private val lambda: Float = 1f): Distribution {
             "Lambda parameter must be greater than 0"
         }
     }
-    override fun range() = (1..100).map {
-        it / (lambda * 5)
+    override fun range() = (0..100).map {
+        (it + 1) / (lambda * 5)
     }
     override fun probabilityDensityFunction(x: Float) = lambda * exp(-lambda * x)
     override fun mean() = 1 / lambda
@@ -78,9 +79,10 @@ class Poisson(private val lambda: Float = 1f): Distribution {
             "Lambda parameter must be greater than 0"
         }
     }
-    override fun range() = (1..2 * lambda.toInt()).map {
-        it * 1f
-    }
+    override fun range() = (0..100)
+        .map { it.toFloat() }
+        .filter { if(lambda < 2) it <= 10 else it <= 20}
+
     override fun probabilityDensityFunction(x: Float): Float {
         val xf = factorial(x.toInt())
         return lambda.pow(x) * exp(-lambda) / xf
@@ -89,17 +91,17 @@ class Poisson(private val lambda: Float = 1f): Distribution {
     override fun standardDeviation() = sqrt(lambda)
 }
 
-class Pareto(private val xm: Float = 1f, private val alpha: Float = 1f) : Distribution {
+class Pareto(private val xm: Float = 1f, private val alpha: Float = 10f) : Distribution {
     init {
         require(xm > 0 && alpha > 0) {
             "Mode and alpha parameter must be higher than 0"
         }
     }
     override fun range() = (0..100).map {
-       1 + it * alpha / 10
+        1f + it / (10 * alpha)
     }
     override fun probabilityDensityFunction(x: Float) =
-        alpha * xm.pow(alpha) / x.toFloat().pow(alpha + 1)
+        alpha * xm.pow(alpha) / x.pow(alpha + 1)
     override fun mean() =
         if (alpha <= 1) Float.POSITIVE_INFINITY else alpha * xm / (alpha - 1)
     override fun standardDeviation() =
@@ -122,18 +124,18 @@ class Gauss(private val mean: Float = 0f, private val sigma: Float = 1f): Distri
     override fun standardDeviation() = sigma
 }
 
-class LogNormal(private val mean: Float = 0f, private val sigma: Float = 1f): Distribution {
+class LogNormal(private val mean: Float = 0f, private val sigma: Float = 0.25f): Distribution {
     init {
         require(sigma > 0) {
             "Sigma must be higher than 0"
         }
     }
     override fun range() = (0..100).map {
-        it / (50 * sigma)
+        mean + sigma * (it + 1) / 10
     }
     override fun probabilityDensityFunction(x: Float) =
-        (1 / (abs(x) * sigma * sqrt(2 * PI.toFloat()))) *
-                exp(-1 * (ln(abs(x)) - mean).pow(2) / (2 * sigma.pow(2)))
+        (1 / (x * sigma * sqrt(2 * PI.toFloat()))) *
+                exp(-1 * (ln(x) - mean).pow(2) / (2 * sigma.pow(2)))
     override fun mean() = exp(mean + sigma.pow(2) / 2)
     override fun standardDeviation() =
         sqrt(exp(sigma.pow(2) - 1) * exp(2 * mean + sigma.pow(2)))

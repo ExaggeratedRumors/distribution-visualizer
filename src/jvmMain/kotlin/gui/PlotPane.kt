@@ -32,13 +32,13 @@ class PlotPane {
     }
 
     @Composable
-    fun printPlotPane(distribution: Distribution) {
+    fun printPlotPane(distribution: Distribution, showGrid: Boolean) {
         Column(modifier = Modifier
             .padding(top = 20.dp, bottom = 0.dp),
         ) {
             Row {
                 printVerticalLabels()
-                printChartScape(distribution)
+                printChartScape(distribution, showGrid)
                 Column (modifier = Modifier
                     .padding(3.dp)
                     .width(IntrinsicSize.Min)
@@ -86,7 +86,7 @@ class PlotPane {
     private fun DrawScope.printGrid() {
         val gridPath = Path()
         val orderOfMagnitudeX = 10.0.pow(floor(ln((xMax - xMin - 1).toDouble()) * 0.4343))
-        (-5..5)
+        (-10..10)
             .map { (it * orderOfMagnitudeX).toFloat() }
             .filter { it in xMin..xMax }
             .map { it.rescale(xMin, xMax, widthMin, widthMax) }
@@ -97,8 +97,8 @@ class PlotPane {
         drawPath(gridPath, color = Theme.colorPalette.onBackground, style = Stroke(width = 1f))
 
         gridPath.reset()
-        val orderOfMagnitudeY = 10.0.pow(floor(ln((yMax - yMin - 1).toDouble()) * 0.4343))
-        (0..10)
+        val orderOfMagnitudeY = 10.0.pow(floor(ln((yMax - yMin).toDouble()) * 0.4343))
+        (-10..10)
             .map { (it * orderOfMagnitudeY).toFloat() }
             .filter { it in yMin..yMax }
             .map { it.rescale(yMin, yMax, heightMax, heightMin) }
@@ -123,7 +123,7 @@ class PlotPane {
     }
 
     @Composable
-    fun printChartScape(distribution: Distribution) {
+    fun printChartScape(distribution: Distribution, showGrid: Boolean) {
         var tooltipValue by remember { mutableStateOf("x:\ny:") }
         Column(
             verticalArrangement = Arrangement.Bottom,
@@ -134,7 +134,7 @@ class PlotPane {
                 .padding(3.dp)
                 .drawBehind {
                     val scaledDistribution = scaleDistribution(distribution)
-                    printGrid()
+                    if(showGrid) printGrid()
                     printGraph(scaledDistribution)
                 }.pointerInput(Unit) {
                     printTooltip { tooltipValue = it }
@@ -153,14 +153,14 @@ class PlotPane {
             modifier = Modifier
                 .padding(3.dp)
                 .width(IntrinsicSize.Min)
-                .size(28.dp,200.dp)
+                .size(38.dp,200.dp)
                 .drawBehind {
                     minY = yMin
                     maxY = yMax
                 }
         ) {
-            Text("%.2f".format(Locale.ROOT, maxY))
-            Text("%.2f".format(Locale.ROOT,minY))
+            Text("%2.2f".format(Locale.ROOT, maxY))
+            Text("%2.2f".format(Locale.ROOT,minY))
         }
     }
 
@@ -178,8 +178,8 @@ class PlotPane {
                 maxX = xMax
             }
         ) {
-            Text("%.2f".format(Locale.ROOT,minX))
-            Text("%.2f".format(Locale.ROOT,maxX))
+            Text("%2.2f".format(Locale.ROOT,minX))
+            Text("%2.2f".format(Locale.ROOT,maxX))
         }
     }
 }

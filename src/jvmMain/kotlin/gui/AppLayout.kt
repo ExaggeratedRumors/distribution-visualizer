@@ -8,11 +8,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import model.*
 import model.Distribution
 import model.Gauss
+import java.util.*
 
 class AppLayout {
     private var distributions = mapOf(
@@ -33,10 +34,13 @@ class AppLayout {
     fun twoColumnsLayout() {
         chosenDistribution = remember { mutableStateOf(Gauss(0f, 1f))}
         showGrid = remember { mutableStateOf(true) }
-        Row (Modifier.fillMaxSize()) {
+        Row (modifier = Modifier
+            .fillMaxSize()
+            .background(Theme.colorPalette.background)
+        ) {
             leftPaneContent()
             Divider (
-                color = Theme.colorPalette.primary,
+                color = Theme.colorPalette.background,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(1.dp)
@@ -51,14 +55,12 @@ class AppLayout {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .padding(20.dp)
                 .fillMaxHeight()
                 .fillMaxWidth(0.7f)
-                .padding(20.dp)
+                .clip(Theme.shapes.small)
+                .background(Theme.colorPalette.secondary)
         ) {
-            Row {
-                Text (text = "Chosen distribution: ${chosenDistribution.value::class.simpleName}", modifier = Modifier.weight(1f))
-            }
-
             Spacer (Modifier.size(20.dp))
             Column (
                 Modifier.weight(1f)
@@ -68,7 +70,7 @@ class AppLayout {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val plotPane = PlotPane()
-                plotPane.printPlotPane(chosenDistribution.value)
+                plotPane.printPlotPane(chosenDistribution.value, showGrid.value)
             }
             Spacer (Modifier.size(20.dp))
             Row (verticalAlignment = Alignment.CenterVertically) {
@@ -78,7 +80,10 @@ class AppLayout {
                     enabled = true,
                     colors = CheckboxDefaults.colors(Theme.colorPalette.primary)
                 )
-                Text("Show Grid")
+                Text(
+                    text = "Show Grid",
+                    color = Theme.colorPalette.onSecondary
+                )
             }
         }
     }
@@ -87,91 +92,64 @@ class AppLayout {
     fun rightPaneContent() {
         Column (
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .fillMaxSize()
                 .padding(20.dp)
+                .fillMaxSize()
+                .clip(Theme.shapes.small)
+                .background(Theme.colorPalette.secondary)
         ) {
-            Text (text = "Input mean")
             Spacer (Modifier.size(20.dp))
-            Row {
-                switchDistribution()
-                Text (text = "Input SD", modifier = Modifier.weight(1f))
-                Spacer (Modifier.size(20.dp))
-                Text (text = "[ ]", modifier = Modifier.weight(1f))
-            }
-            ExtendedFloatingActionButton(
+            Text (
+                text = "Mean: %.2f".format(Locale.ROOT, chosenDistribution.value.mean()),
+                color = Theme.colorPalette.onSecondary
+            )
+            Text (
+                text = "SD: %.2f".format(Locale.ROOT, chosenDistribution.value.standardDeviation()),
+                color = Theme.colorPalette.onSecondary
+            )
+            Spacer (Modifier.size(20.dp))
+            switchDistribution()
+            Spacer (Modifier.size(20.dp))
+            /*ExtendedFloatingActionButton(
                 onClick = { chosenDistribution.value = if (chosenDistribution.value is Gauss) Poisson(1f) else Gauss(0f, 1f) },
             text = { Text(text = "Change distribution") }
-            )
+            )*/
         }
     }
 
     @Composable
     fun switchDistribution() {
         var expanded by remember { mutableStateOf(false) }
-        var disabledValue = chosenDistribution.value::class.simpleName!!
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.TopStart)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(150.dp, 50.dp)
+                .clip(Theme.shapes.small)
+                .background(Theme.colorPalette.primary)
+                .clickable(onClick = { expanded = true })
         ) {
             Text(
-                chosenDistribution.value::class.simpleName!!,
+                text = chosenDistribution.value::class.simpleName!!,
+                color = Theme.colorPalette.onSecondary,
+                //textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .size(200.dp, 45.dp)
-                    .clickable(onClick = { expanded = true }).background(Color.Gray)
+                    .align(Alignment.Center)
             )
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .size(200.dp, 500.dp)
+                    .size(150.dp, (50 * distributions.size).dp)
                     .background(Theme.colorPalette.primary)
+                    .clip(Theme.shapes.small)
             ) {
                 distributions.keys.forEach { value ->
                     DropdownMenuItem(onClick = {
-                            chosenDistribution.value = distributions[value]!!
-                            expanded = false
-                        }) {
-                        val disabledText = if(value == disabledValue) {
-                            " (Disabled)"
-                        } else {
-                            ""
-                        }
-                        Text(text = value + disabledText)
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun DropdownDemo() {
-        var expanded by remember { mutableStateOf(false) }
-        val items = listOf("A", "B", "C", "D", "E", "F")
-        val disabledValue = "B"
-        var selectedIndex by remember { mutableStateOf(0) }
-        Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
-            Text(items[selectedIndex],modifier = Modifier.size(300.dp, 45.dp).clickable(onClick = { expanded = true }).background(
-                Color.Gray))
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .size(300.dp,700.dp)
-                    .background(Color.Red)
-            ) {
-                items.forEachIndexed { index, s ->
-                    DropdownMenuItem(onClick = {
-                        selectedIndex = index
+                        chosenDistribution.value = distributions[value]!!
                         expanded = false
                     }) {
-                        val disabledText = if (s == disabledValue) {
-                            " (Disabled)"
-                        } else {
-                            ""
-                        }
-                        Text(text = s + disabledText)
+                        Text(text = value, color = Theme.colorPalette.onSecondary)
                     }
                 }
             }
