@@ -124,7 +124,7 @@ class Gauss(private val mean: Float = 0f, private val sigma: Float = 1f): Distri
     override fun standardDeviation() = sigma
 }
 
-class LogNormal(private val mean: Float = 0f, private val sigma: Float = 0.25f): Distribution {
+class LogNormal(private val mean: Float = 0f, private val sigma: Float = 1f): Distribution {
     init {
         require(sigma > 0) {
             "Sigma must be higher than 0"
