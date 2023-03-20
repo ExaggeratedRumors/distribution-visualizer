@@ -1,4 +1,4 @@
-# Distribution Visualizer 1.1b
+## Distribution Visualizer 1.1b
 
 ![Windows support](https://img.shields.io/badge/Platform-Windows-lightgrey) ![Java JDK requirement](https://img.shields.io/badge/JDK-11-blue)
 
@@ -7,17 +7,17 @@ The technology used illustrates the potential of combining the building of a use
 
 ![Preview](images/preview.gif)
 
-# Technologies
+## Technologies
 
 - Desktop Compose 1.2.2
 - Kotlin 1.7.20
 
-# Requirements
+## Requirements
 
 - JDK 11
 - Gradle 8.0.2
 
-# Application execution
+## Application execution
 
 1. Make sure your JAVA_HOME paths to jdk directory.
 2. Clone repository:
