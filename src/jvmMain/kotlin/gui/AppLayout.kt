@@ -30,6 +30,8 @@ class AppLayout {
 
     private lateinit var chosenDistribution : MutableState<Distribution>
     private lateinit var showGrid : MutableState<Boolean>
+    private val plotPane = PlotPane()
+
     @Composable
     fun twoColumnsLayout() {
         chosenDistribution = remember { mutableStateOf(Gauss(0f, 1f))}
@@ -69,7 +71,6 @@ class AppLayout {
                     .background(color = Theme.colorPalette.onSurface),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val plotPane = PlotPane()
                 plotPane.printPlotPane(chosenDistribution.value, showGrid.value)
             }
             Spacer (Modifier.size(20.dp))
@@ -111,6 +112,8 @@ class AppLayout {
             Spacer (Modifier.size(20.dp))
             switchDistribution()
             Spacer (Modifier.size(20.dp))
+            inputVariables()
+
             /*ExtendedFloatingActionButton(
                 onClick = { chosenDistribution.value = if (chosenDistribution.value is Gauss) Poisson(1f) else Gauss(0f, 1f) },
             text = { Text(text = "Change distribution") }
@@ -132,7 +135,6 @@ class AppLayout {
             Text(
                 text = chosenDistribution.value::class.simpleName!!,
                 color = Theme.colorPalette.onSecondary,
-                //textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.Center)
             )
@@ -153,6 +155,41 @@ class AppLayout {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun inputVariables() {
+        val maxChar = 10
+        val parameters = chosenDistribution.value.getParameters()
+        val states = parameters.toList().map { (k, v) ->
+            Pair(k, remember(k) { mutableStateOf(v) })
+        }
+
+        states.forEach { (k, v) ->
+            Text(
+                text = "$k:",
+                color = Theme.colorPalette.onSecondary,
+            )
+            Spacer (Modifier.size(5.dp))
+            TextField(
+                value = v.value.toString(),
+                onValueChange = { text ->
+                    if (text.length > maxChar || text.contains("\n")) return@TextField
+                    v.value = text.toFloat()
+                    chosenDistribution.value.setParameters(states.map { (_, p) -> p.value })
+                },
+                modifier = Modifier
+                    .size(150.dp, 50.dp)
+                    .clip(Theme.shapes.large),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Theme.colorPalette.background,
+                    focusedIndicatorColor = Theme.colorPalette.onSecondary,
+                    unfocusedIndicatorColor = Theme.colorPalette.onPrimary,
+                    textColor = Theme.colorPalette.onSurface
+                )
+            )
+            Spacer (Modifier.size(20.dp))
         }
     }
 }
