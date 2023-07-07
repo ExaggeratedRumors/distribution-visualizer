@@ -120,11 +120,6 @@ class AppLayout {
             switchDistribution()
             Spacer (Modifier.size(20.dp))
             inputVariables()
-
-            /*ExtendedFloatingActionButton(
-                onClick = { chosenDistribution.value = if (chosenDistribution.value is Gauss) Poisson(1f) else Gauss(0f, 1f) },
-            text = { Text(text = "Change distribution") }
-            )*/
         }
     }
 

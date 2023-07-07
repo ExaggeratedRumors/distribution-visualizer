@@ -1,9 +1,21 @@
-## Distribution Visualizer 1.1b
+## Distribution Visualizer
 
 ![Windows support](https://img.shields.io/badge/Platform-Windows-lightgrey) ![Java JDK requirement](https://img.shields.io/badge/JDK-11-blue)
 
 Application visualizing common probability distributions based on probability density function.
 The technology used illustrates the potential of combining the building of a user interface with the calculation of mathematical models by the engine.
+
+## Release
+`
+version 1.2
+`
+```diff
++ input fields
++ components invalidation
+- Poisson distribution range calculation bug
+```
+
+## Preview
 
 ![Preview](images/preview.gif)
 

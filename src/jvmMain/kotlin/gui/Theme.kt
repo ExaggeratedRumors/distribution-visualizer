@@ -10,11 +10,11 @@ import androidx.compose.ui.unit.dp
 
 object Theme {
     val colorPalette = darkColors(
-        primary = Color(79, 67, 103),
-        surface = Color(77, 65, 102),
-        onSurface = Color(199, 211, 221),
-        secondary = Color(27, 26, 36),
-        background = Color(40, 40, 57),
+        primary = Color(73, 80, 87),
+        surface = Color(74, 81, 88),
+        onSurface = Color(	233, 236, 239),
+        secondary = Color(	173, 181, 189),
+        background = Color(108, 117, 125),
         onPrimary = Color.White,
         onSecondary = Color.White
     )
