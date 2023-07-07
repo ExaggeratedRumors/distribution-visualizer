@@ -109,7 +109,6 @@ class Exponential(private var lambda: Float = 1f) : Distribution {
     override fun standardDeviation() = 1 / lambda
     override fun getParameters(): Map<String, Float> = mapOf("lambda" to lambda)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         lambda = args[0]
     }
 }
@@ -121,7 +120,7 @@ class Poisson(private var lambda: Float = 1f) : Distribution {
         }
     }
 
-    override fun range() = (0..100).map { it.toFloat() }.filter { if (lambda < 2) it <= 10 else it <= 20 }
+    override fun range() = (0..100).map { it.toFloat() }.filter { it <= 12 }
     override fun conditions() = lambda > 0
     override fun probabilityDensityFunction(x: Float): Float {
         val xf = factorial(x.toInt())
@@ -132,7 +131,6 @@ class Poisson(private var lambda: Float = 1f) : Distribution {
     override fun standardDeviation() = sqrt(lambda)
     override fun getParameters(): Map<String, Float> = mapOf("lambda" to lambda)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         lambda = args[0]
     }
 }
@@ -158,7 +156,6 @@ class Pareto(private var xm: Float = 1f, private var alpha: Float = 10f) : Distr
 
     override fun getParameters(): Map<String, Float> = mapOf("xm" to xm, "alpha" to alpha)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         xm = args[0]
         alpha = args[1]
     }
@@ -183,7 +180,6 @@ class Gauss(private var mean: Float = 0f, private var sigma: Float = 1f) : Distr
     override fun standardDeviation() = sigma
     override fun getParameters(): Map<String, Float> = mapOf("mean" to mean, "sigma" to sigma)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         mean = args[0]
         sigma = args[1]
     }
@@ -209,7 +205,6 @@ class LogNormal(private var mean: Float = 0f, private var sigma: Float = 1f) : D
 
     override fun getParameters(): Map<String, Float> = mapOf("mean" to mean, "sigma" to sigma)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         mean = args[0]
         sigma = args[1]
     }
@@ -241,7 +236,6 @@ class Gumbel(private var mean: Float = 0f, private var beta: Float = 1f) : Distr
     override fun standardDeviation() = PI.toFloat() * beta / 6
     override fun getParameters(): Map<String, Float> = mapOf("mean" to mean, "beta" to beta)
     override fun setParameters(args: List<Float>) {
-        if(!conditions()) return
         mean = args[0]
         beta = args[1]
     }

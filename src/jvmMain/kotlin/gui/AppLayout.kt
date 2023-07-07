@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.unit.dp
 import model.*
 import model.Distribution
@@ -91,6 +92,8 @@ class AppLayout {
 
     @Composable
     fun rightPaneContent() {
+        var meanText by remember { mutableStateOf("Mean:") }
+        var sdText by remember { mutableStateOf("SD:") }
         Column (
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,14 +102,18 @@ class AppLayout {
                 .fillMaxSize()
                 .clip(Theme.shapes.small)
                 .background(Theme.colorPalette.secondary)
+                .drawBehind {
+                    meanText = "Mean: %.2f".format(Locale.ROOT, chosenDistribution.value.mean())
+                    sdText = "SD: %.2f".format(Locale.ROOT, chosenDistribution.value.standardDeviation())
+                }
         ) {
             Spacer (Modifier.size(20.dp))
             Text (
-                text = "Mean: %.2f".format(Locale.ROOT, chosenDistribution.value.mean()),
+                text = meanText,
                 color = Theme.colorPalette.onSecondary
             )
             Text (
-                text = "SD: %.2f".format(Locale.ROOT, chosenDistribution.value.standardDeviation()),
+                text = sdText,
                 color = Theme.colorPalette.onSecondary
             )
             Spacer (Modifier.size(20.dp))
@@ -171,13 +178,14 @@ class AppLayout {
                 text = "$k:",
                 color = Theme.colorPalette.onSecondary,
             )
-            Spacer (Modifier.size(5.dp))
+            Spacer(Modifier.size(5.dp))
             TextField(
                 value = v.value.toString(),
                 onValueChange = { text ->
                     if (text.length > maxChar || text.contains("\n")) return@TextField
                     v.value = text.toFloat()
                     chosenDistribution.value.setParameters(states.map { (_, p) -> p.value })
+                    plotPane.invalidate()
                 },
                 modifier = Modifier
                     .size(150.dp, 50.dp)
@@ -189,7 +197,7 @@ class AppLayout {
                     textColor = Theme.colorPalette.onSurface
                 )
             )
-            Spacer (Modifier.size(20.dp))
+            Spacer(Modifier.size(20.dp))
         }
     }
 }

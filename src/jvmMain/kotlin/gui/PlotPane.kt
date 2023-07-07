@@ -30,6 +30,11 @@ class PlotPane {
         var heightMin = 0f
         var heightMax = 0f
     }
+    lateinit var compositionContext : RecomposeScope
+
+    fun invalidate() {
+        compositionContext.invalidate()
+    }
 
     @Composable
     fun printPlotPane(distribution: Distribution, showGrid: Boolean) {
@@ -47,6 +52,7 @@ class PlotPane {
             }
         }
         printHorizontalLabels()
+        compositionContext = currentRecomposeScope
     }
 
     private fun Float.rescale(
