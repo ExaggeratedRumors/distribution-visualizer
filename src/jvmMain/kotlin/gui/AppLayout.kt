@@ -178,7 +178,11 @@ class AppLayout {
                 value = v.value.toString(),
                 onValueChange = { text ->
                     if (text.length > maxChar || text.contains("\n")) return@TextField
-                    v.value = text.toFloat()
+                    try {
+                        v.value = text.toFloat()
+                    } catch (e: Exception) {
+                        return@TextField
+                    }
                     chosenDistribution.value.setParameters(states.map { (_, p) -> p.value })
                     plotPane.invalidate()
                 },
